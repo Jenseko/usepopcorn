@@ -1,3 +1,4 @@
+import { logDOM } from "@testing-library/react";
 import { useEffect, useState } from "react";
 
 const tempMovieData = [
@@ -54,16 +55,23 @@ const KEY = "1acc6a47";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-
   const [watched, setWatched] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const query = "batman";
 
   useEffect(function () {
-    fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=predator`)
-      .then((res) => res.json())
-      .then((data) => setMovies(data.Search));
+    async function fetchedMovies() {
+      setIsLoading(true);
+      const res = await fetch(
+        `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+      );
+      const data = await res.json();
+      setMovies(data.Search);
+      setIsLoading(false);
+    }
+    fetchedMovies();
   }, []);
-
-  // -- Not allowed in render logic --
+  // an empty array --> useEffect wird nur beim ersten Mounting ausgeführt
 
   // Component composition
   return (
@@ -74,9 +82,7 @@ export default function App() {
       </NavBar>
 
       <Main>
-        <Box>
-          <MovieList movies={movies} />
-        </Box>
+        <Box>{isLoading ? <Loader /> : <MovieList movies={movies} />}</Box>
 
         <Box>
           <WatchedSummary watched={watched} />
@@ -85,6 +91,10 @@ export default function App() {
       </Main>
     </>
   );
+}
+
+function Loader() {
+  return <p className="loader">Loading...</p>;
 }
 
 function NavBar({ children }) {
