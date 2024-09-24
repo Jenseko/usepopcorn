@@ -292,6 +292,9 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [userRating, setUserRating] = useState("");
 
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
+  const watchedUserRating = watched.find(
+    (movie) => movie.imdbID === selectedId
+  )?.userRating;
 
   const {
     Title: title,
@@ -314,6 +317,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
       poster,
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ").at(0)),
+      userRating,
     };
 
     console.log(newWatchedMovie);
@@ -378,7 +382,10 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
                   )}
                 </>
               ) : (
-                <p>You already rated this movie.</p>
+                <p>
+                  You already rated this movie with {watchedUserRating}
+                  <span> ⭐️</span>
+                </p>
               )}
             </div>
             <p>
@@ -445,7 +452,7 @@ function WatchedMovie({ movie }) {
         </p>
         <p>
           <span>🌟</span>
-          <span>{movie.userRating}</span>
+          <span>{movie.userRating ? movie.userRating : "No rating"}</span>
         </p>
         <p>
           <span>⏳</span>
